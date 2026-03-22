@@ -8,7 +8,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #06000f;
+      background: #1a0535;
       font-family: 'Georgia', serif;
       overflow: hidden;
       height: 100vh;
@@ -16,7 +16,6 @@
       cursor: crosshair;
     }
 
-    /* ── Stars ── */
     #stars {
       position: fixed;
       inset: 0;
@@ -30,23 +29,21 @@
       animation: twinkle var(--d) ease-in-out infinite alternate;
     }
     @keyframes twinkle {
-      from { opacity: 0.08; transform: scale(1); }
-      to   { opacity: 0.9;  transform: scale(1.5); }
+      from { opacity: 0.15; transform: scale(1); }
+      to   { opacity: 1;    transform: scale(1.5); }
     }
 
-    /* ── Nebula glow ── */
     #nebula {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
       background:
-        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(100,20,180,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 35% at 80% 70%, rgba(180,20,80,0.12)  0%, transparent 70%),
-        radial-gradient(ellipse 40% 50% at 55% 50%, rgba(20,60,180,0.10)  0%, transparent 70%);
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(160,60,255,0.22) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 70%, rgba(255,60,120,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 55% 50%, rgba(60,100,255,0.12) 0%, transparent 70%);
     }
 
-    /* ── Falling items ── */
     .petal {
       position: fixed;
       top: -60px;
@@ -57,14 +54,13 @@
       filter: drop-shadow(0 0 8px var(--glow));
       z-index: 10;
     }
-    .petal:hover { filter: drop-shadow(0 0 16px var(--glow)) brightness(1.4); }
+    .petal:hover { filter: drop-shadow(0 0 18px var(--glow)) brightness(1.5); }
     @keyframes fall {
-      0%   { top: -60px;  opacity: 1;   transform: rotate(0deg)   translateX(0); }
-      85%  {              opacity: 0.9; }
-      100% { top: 108vh;  opacity: 0;   transform: rotate(var(--rot)) translateX(var(--sway)); }
+      0%   { top: -60px; opacity: 1;   transform: rotate(0deg) translateX(0); }
+      85%  {             opacity: 0.9; }
+      100% { top: 108vh; opacity: 0;   transform: rotate(var(--rot)) translateX(var(--sway)); }
     }
 
-    /* ── Collect burst ── */
     .burst {
       position: fixed;
       pointer-events: none;
@@ -77,7 +73,6 @@
       100% { opacity: 0; transform: translate(var(--fx),var(--fy)) scale(0.3); }
     }
 
-    /* ── Score ring ── */
     #hud {
       position: fixed;
       top: 22px;
@@ -87,46 +82,75 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
     }
     #hud-label {
-      color: #c89cff;
-      font-size: 12px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-shadow: 0 0 10px #9050ff;
+      color: #fff;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 12px #d080ff, 0 1px 3px rgba(0,0,0,0.8);
+      background: rgba(80,20,140,0.55);
+      padding: 5px 16px;
+      border-radius: 99px;
+      border: 1px solid rgba(200,130,255,0.35);
+      backdrop-filter: blur(6px);
+      white-space: nowrap;
     }
     #bar-wrap {
       position: relative;
-      width: 200px;
-      height: 12px;
-      background: rgba(255,255,255,0.07);
+      width: 220px;
+      height: 13px;
+      background: rgba(255,255,255,0.1);
       border-radius: 99px;
-      border: 1px solid rgba(140,60,220,0.5);
+      border: 1px solid rgba(200,140,255,0.4);
       overflow: hidden;
     }
     #magic-bar {
       height: 100%;
       width: 0%;
       border-radius: 99px;
-      background: linear-gradient(90deg, #7020e0, #e040a0, #ffc040);
+      background: linear-gradient(90deg, #a040ff, #ff60b0, #ffd040);
       transition: width 0.35s ease;
-      box-shadow: 0 0 12px #c060ff;
+      box-shadow: 0 0 14px #d070ff;
     }
     #score-txt {
-      color: #ffd060;
-      font-size: 12px;
-      text-shadow: 0 0 8px #ffaa00;
+      color: #ffe88a;
+      font-size: 13px;
+      text-shadow: 0 0 10px #ffaa00, 0 1px 2px rgba(0,0,0,0.6);
       letter-spacing: 1px;
     }
 
-    /* ── Hint ── */
+    #wish-done {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      z-index: 35;
+      color: #fff;
+      font-size: clamp(22px, 4vw, 38px);
+      letter-spacing: 3px;
+      text-align: center;
+      text-shadow: 0 0 30px #ff80c0, 0 0 60px #a040ff;
+      background: rgba(60,10,100,0.7);
+      padding: 18px 36px;
+      border-radius: 20px;
+      border: 1px solid rgba(220,150,255,0.5);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    #wish-done.pop {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
     #hint {
       position: fixed;
       bottom: 26px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(190,150,255,0.55);
+      color: rgba(220,180,255,0.7);
       font-size: 13px;
       letter-spacing: 1px;
       z-index: 30;
@@ -136,7 +160,6 @@
     }
     @keyframes hint-fade { to { opacity: 0; } }
 
-    /* ── Overlay reveal ── */
     #overlay {
       position: fixed;
       inset: 0;
@@ -145,7 +168,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(ellipse at 50% 45%, #160030 0%, #04000c 75%);
+      background: radial-gradient(ellipse at 50% 45%, #2a0050 0%, #0e0020 75%);
       opacity: 0;
       pointer-events: none;
       transition: opacity 1.2s ease;
@@ -157,7 +180,7 @@
     #overlay-glow {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 50% 42%, rgba(160,50,255,0.22) 0%, transparent 65%);
+      background: radial-gradient(ellipse at 50% 42%, rgba(180,70,255,0.28) 0%, transparent 65%);
       animation: og 4s ease-in-out infinite alternate;
     }
     @keyframes og { from { opacity: 0.5; } to { opacity: 1; } }
@@ -166,7 +189,7 @@
       font-size: 64px;
       position: relative;
       margin-bottom: 18px;
-      filter: drop-shadow(0 0 24px #ff80c0);
+      filter: drop-shadow(0 0 28px #ff90d0);
       animation: float 3.5s ease-in-out infinite alternate;
     }
     @keyframes float {
@@ -176,53 +199,51 @@
     #ov-title {
       position: relative;
       font-size: clamp(30px, 5.5vw, 56px);
-      color: #ffd060;
+      color: #ffe070;
       text-shadow: 0 0 28px #ffaa00, 0 0 60px #ff6000;
       letter-spacing: 2px;
       margin-bottom: 18px;
     }
     #ov-body {
       position: relative;
-      font-size: clamp(15px, 2.4vw, 21px);
-      color: #e0c8ff;
+      font-size: clamp(16px, 2.4vw, 22px);
+      color: #f0dcff;
       line-height: 1.85;
       max-width: 540px;
-      text-shadow: 0 0 12px #9040cc;
+      text-shadow: 0 0 14px #b060ee;
       white-space: pre-line;
       min-height: 4em;
     }
     #ov-sub {
       position: relative;
       margin-top: 24px;
-      font-size: clamp(14px, 2vw, 18px);
-      color: #ff90c8;
-      text-shadow: 0 0 10px #ff40a0;
+      font-size: clamp(15px, 2vw, 19px);
+      color: #ffb0d8;
+      text-shadow: 0 0 12px #ff50b0;
       font-style: italic;
       letter-spacing: 1px;
     }
     #replay-btn {
       position: relative;
       margin-top: 38px;
-      background: none;
-      border: 1px solid rgba(180,90,255,0.5);
-      color: #c090ff;
+      background: rgba(100,30,180,0.35);
+      border: 1px solid rgba(210,130,255,0.55);
+      color: #e0b0ff;
       font-size: 13px;
-      letter-spacing: 2.5px;
-      padding: 10px 30px;
+      letter-spacing: 2px;
+      padding: 11px 32px;
       border-radius: 99px;
       cursor: pointer;
-      text-transform: uppercase;
       transition: all 0.25s;
       font-family: 'Georgia', serif;
     }
     #replay-btn:hover {
-      background: rgba(130,50,220,0.25);
-      border-color: #c090ff;
-      box-shadow: 0 0 18px #9040ff;
+      background: rgba(130,50,220,0.5);
+      border-color: #d090ff;
+      box-shadow: 0 0 20px #a050ff;
       color: #fff;
     }
 
-    /* ── Fireworks ── */
     .fw {
       position: fixed;
       pointer-events: none;
@@ -238,36 +259,33 @@
 </head>
 <body>
 
-<!-- Background -->
 <div id="stars"></div>
 <div id="nebula"></div>
 
-<!-- HUD -->
 <div id="hud">
   <div id="hud-label">Собери волшебные артефакты, чтобы загадать желание!</div>
   <div id="bar-wrap"><div id="magic-bar"></div></div>
   <div id="score-txt">0 / 30</div>
 </div>
 
+<div id="wish-done">✨ Желание исполнено! ✨</div>
+
 <div id="hint">Лови падающие лепестки и кристаллы ✨</div>
 
-<!-- Final message -->
 <div id="overlay">
   <div id="overlay-glow"></div>
   <div class="ov-icon">✨</div>
   <div id="ov-title">С Днём Рождения!</div>
   <div id="ov-body"></div>
   <div id="ov-sub"></div>
-  <button id="replay-btn">Загадать еще одно желание</button>
+  <button id="replay-btn">Загадать ещё одно желание</button>
 </div>
 
 <script>
-// ── Settings — измени текст здесь ──────────────────────────────
-const GOAL    = 30;
-const BODY    = `Дорогая мама,\n\nв этот волшебный день желаю тебе\nбесконечного счастья, здоровья\nи радости в каждом мгновении жизни.`;
-const SUB     = `Ты самая лучшая ❤️`;
+const GOAL = 30;
+const BODY = `Дорогая мама,\n\nв этот волшебный день желаю тебе\nбесконечного счастья, здоровья\nи радости в каждом мгновении жизни.`;
+const SUB  = `Ты самая лучшая ❤️`;
 
-// ── Items ───────────────────────────────────────────────────────
 const ITEMS = [
   { e:'🌸', glow:'#ff80c0', pts:1 },
   { e:'🌺', glow:'#ff6040', pts:1 },
@@ -283,10 +301,8 @@ const ITEMS = [
   { e:'🌙', glow:'#c0d0ff', pts:2 },
 ];
 
-// ── State ───────────────────────────────────────────────────────
 let collected = 0, done = false;
 
-// ── Stars ───────────────────────────────────────────────────────
 const starsEl = document.getElementById('stars');
 for (let i = 0; i < 160; i++) {
   const s = document.createElement('div');
@@ -301,15 +317,13 @@ for (let i = 0; i < 160; i++) {
   starsEl.appendChild(s);
 }
 
-// ── HUD ──────────────────────────────────────────────────────────
-const barEl  = document.getElementById('magic-bar');
-const txtEl  = document.getElementById('score-txt');
+const barEl = document.getElementById('magic-bar');
+const txtEl = document.getElementById('score-txt');
 function updateHUD() {
   barEl.style.width = Math.min(collected/GOAL*100, 100) + '%';
   txtEl.textContent = `${Math.min(collected, GOAL)} / ${GOAL}`;
 }
 
-// ── Burst ────────────────────────────────────────────────────────
 function spawnBurst(x, y, emoji) {
   for (let i = 0; i < 7; i++) {
     const b = document.createElement('div');
@@ -329,9 +343,8 @@ function spawnBurst(x, y, emoji) {
   }
 }
 
-// ── Fireworks ────────────────────────────────────────────────────
 function fireworks() {
-  const colors = ['#ffd060','#ff80c0','#a060ff','#80ffff','#ff6040','#c0ff80','#ffb040'];
+  const colors = ['#ffd060','#ff80c0','#c080ff','#80ffff','#ff6040','#c0ff80','#ffb040'];
   for (let w = 0; w < 9; w++) {
     setTimeout(() => {
       const cx = 80 + Math.random() * (window.innerWidth - 160);
@@ -357,7 +370,6 @@ function fireworks() {
   }
 }
 
-// ── Typewriter ───────────────────────────────────────────────────
 function typeWriter(el, text, speed, cb) {
   let i = 0; el.textContent = '';
   const tick = () => {
@@ -367,32 +379,35 @@ function typeWriter(el, text, speed, cb) {
   tick();
 }
 
-// ── Show reveal ──────────────────────────────────────────────────
 function showReveal() {
   done = true;
   fireworks();
+
+  const wishEl = document.getElementById('wish-done');
+  wishEl.classList.add('pop');
   setTimeout(() => {
-    const ov = document.getElementById('overlay');
-    ov.classList.add('show');
+    wishEl.classList.remove('pop');
+  }, 2200);
+
+  setTimeout(() => {
+    const ov    = document.getElementById('overlay');
     const bodyEl = document.getElementById('ov-body');
     const subEl  = document.getElementById('ov-sub');
+    ov.classList.add('show');
     typeWriter(bodyEl, BODY, 38, () => {
       setTimeout(() => { subEl.textContent = SUB; }, 300);
     });
-  }, 700);
+  }, 1800);
 }
 
-// ── Replay ───────────────────────────────────────────────────────
 document.getElementById('replay-btn').addEventListener('click', () => {
   collected = 0; done = false;
   updateHUD();
-  const ov = document.getElementById('overlay');
-  ov.classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
   document.getElementById('ov-body').textContent = '';
   document.getElementById('ov-sub').textContent  = '';
 });
 
-// ── Spawn item ───────────────────────────────────────────────────
 function spawnItem() {
   if (done) return;
   const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
@@ -427,7 +442,6 @@ function spawnItem() {
   document.body.appendChild(el);
 }
 
-// ── Loop ─────────────────────────────────────────────────────────
 function loop() {
   if (!done) spawnItem();
   setTimeout(loop, 550 + Math.random()*650);
