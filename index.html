@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>С Днём Рождения!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #06000f;
+      font-family: 'Georgia', serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      cursor: crosshair;
+    }
+
+    /* ── Stars ── */
+    #stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.08; transform: scale(1); }
+      to   { opacity: 0.9;  transform: scale(1.5); }
+    }
+
+    /* ── Nebula glow ── */
+    #nebula {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(100,20,180,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 70%, rgba(180,20,80,0.12)  0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 55% 50%, rgba(20,60,180,0.10)  0%, transparent 70%);
+    }
+
+    /* ── Falling items ── */
+    .petal {
+      position: fixed;
+      top: -60px;
+      font-size: clamp(26px, 3.5vw, 44px);
+      cursor: pointer;
+      user-select: none;
+      animation: fall linear forwards;
+      filter: drop-shadow(0 0 8px var(--glow));
+      z-index: 10;
+    }
+    .petal:hover { filter: drop-shadow(0 0 16px var(--glow)) brightness(1.4); }
+    @keyframes fall {
+      0%   { top: -60px;  opacity: 1;   transform: rotate(0deg)   translateX(0); }
+      85%  {              opacity: 0.9; }
+      100% { top: 108vh;  opacity: 0;   transform: rotate(var(--rot)) translateX(var(--sway)); }
+    }
+
+    /* ── Collect burst ── */
+    .burst {
+      position: fixed;
+      pointer-events: none;
+      font-size: 18px;
+      z-index: 20;
+      animation: burst-up 0.75s ease-out forwards;
+    }
+    @keyframes burst-up {
+      0%   { opacity: 1; transform: translate(var(--ox),var(--oy)) scale(1.2); }
+      100% { opacity: 0; transform: translate(var(--fx),var(--fy)) scale(0.3); }
+    }
+
+    /* ── Score ring ── */
+    #hud {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+    #hud-label {
+      color: #c89cff;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px #9050ff;
+    }
+    #bar-wrap {
+      position: relative;
+      width: 200px;
+      height: 12px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      border: 1px solid rgba(140,60,220,0.5);
+      overflow: hidden;
+    }
+    #magic-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #7020e0, #e040a0, #ffc040);
+      transition: width 0.35s ease;
+      box-shadow: 0 0 12px #c060ff;
+    }
+    #score-txt {
+      color: #ffd060;
+      font-size: 12px;
+      text-shadow: 0 0 8px #ffaa00;
+      letter-spacing: 1px;
+    }
+
+    /* ── Hint ── */
+    #hint {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(190,150,255,0.55);
+      font-size: 13px;
+      letter-spacing: 1px;
+      z-index: 30;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: hint-fade 3s ease 2.5s forwards;
+    }
+    @keyframes hint-fade { to { opacity: 0; } }
+
+    /* ── Overlay reveal ── */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 45%, #160030 0%, #04000c 75%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s ease;
+      text-align: center;
+      padding: 40px 24px;
+    }
+    #overlay.show { opacity: 1; pointer-events: all; }
+
+    #overlay-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 42%, rgba(160,50,255,0.22) 0%, transparent 65%);
+      animation: og 4s ease-in-out infinite alternate;
+    }
+    @keyframes og { from { opacity: 0.5; } to { opacity: 1; } }
+
+    .ov-icon {
+      font-size: 64px;
+      position: relative;
+      margin-bottom: 18px;
+      filter: drop-shadow(0 0 24px #ff80c0);
+      animation: float 3.5s ease-in-out infinite alternate;
+    }
+    @keyframes float {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-14px); }
+    }
+    #ov-title {
+      position: relative;
+      font-size: clamp(30px, 5.5vw, 56px);
+      color: #ffd060;
+      text-shadow: 0 0 28px #ffaa00, 0 0 60px #ff6000;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+    #ov-body {
+      position: relative;
+      font-size: clamp(15px, 2.4vw, 21px);
+      color: #e0c8ff;
+      line-height: 1.85;
+      max-width: 540px;
+      text-shadow: 0 0 12px #9040cc;
+      white-space: pre-line;
+      min-height: 4em;
+    }
+    #ov-sub {
+      position: relative;
+      margin-top: 24px;
+      font-size: clamp(14px, 2vw, 18px);
+      color: #ff90c8;
+      text-shadow: 0 0 10px #ff40a0;
+      font-style: italic;
+      letter-spacing: 1px;
+    }
+    #replay-btn {
+      position: relative;
+      margin-top: 38px;
+      background: none;
+      border: 1px solid rgba(180,90,255,0.5);
+      color: #c090ff;
+      font-size: 13px;
+      letter-spacing: 2.5px;
+      padding: 10px 30px;
+      border-radius: 99px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s;
+      font-family: 'Georgia', serif;
+    }
+    #replay-btn:hover {
+      background: rgba(130,50,220,0.25);
+      border-color: #c090ff;
+      box-shadow: 0 0 18px #9040ff;
+      color: #fff;
+    }
+
+    /* ── Fireworks ── */
+    .fw {
+      position: fixed;
+      pointer-events: none;
+      z-index: 45;
+      border-radius: 50%;
+      animation: fw-go var(--dur) ease-out forwards;
+    }
+    @keyframes fw-go {
+      0%   { transform: translate(0,0) scale(1.4); opacity: 1; }
+      100% { transform: translate(var(--tx),var(--ty)) scale(0); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background -->
+<div id="stars"></div>
+<div id="nebula"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-label">✦ Собери волшебство ✦</div>
+  <div id="bar-wrap"><div id="magic-bar"></div></div>
+  <div id="score-txt">0 / 30</div>
+</div>
+
+<div id="hint">Лови падающие лепестки и кристаллы ✨</div>
+
+<!-- Final message -->
+<div id="overlay">
+  <div id="overlay-glow"></div>
+  <div class="ov-icon">🌸</div>
+  <div id="ov-title">С Днём Рождения!</div>
+  <div id="ov-body"></div>
+  <div id="ov-sub"></div>
+  <button id="replay-btn">✦ Сыграть снова ✦</button>
+</div>
+
+<script>
+// ── Settings — измени текст здесь ──────────────────────────────
+const GOAL    = 30;
+const BODY    = `Дорогая мамочка,\n\nв этот волшебный день желаю тебе\nбесконечного счастья, здоровья\nи радости в каждом мгновении жизни.\n\nТы — лучшая мама на свете! 🌺`;
+const SUB     = `С любовью, всегда ❤️`;
+
+// ── Items ───────────────────────────────────────────────────────
+const ITEMS = [
+  { e:'🌸', glow:'#ff80c0', pts:1 },
+  { e:'🌺', glow:'#ff6040', pts:1 },
+  { e:'🌷', glow:'#ff90d0', pts:1 },
+  { e:'💐', glow:'#ffb0e0', pts:1 },
+  { e:'✨', glow:'#ffffa0', pts:2 },
+  { e:'💎', glow:'#80d0ff', pts:2 },
+  { e:'🔮', glow:'#c080ff', pts:2 },
+  { e:'⭐', glow:'#ffd060', pts:1 },
+  { e:'🌟', glow:'#ffff80', pts:2 },
+  { e:'🦋', glow:'#a0e0ff', pts:1 },
+  { e:'🍄', glow:'#ff9040', pts:1 },
+  { e:'🌙', glow:'#c0d0ff', pts:2 },
+];
+
+// ── State ───────────────────────────────────────────────────────
+let collected = 0, done = false;
+
+// ── Stars ───────────────────────────────────────────────────────
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 160; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const sz = Math.random() * 2.2 + 0.4;
+  s.style.cssText = `
+    left:${Math.random()*100}%;top:${Math.random()*100}%;
+    width:${sz}px;height:${sz}px;
+    --d:${(1.5+Math.random()*3).toFixed(1)}s;
+    animation-delay:${(Math.random()*5).toFixed(1)}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// ── HUD ──────────────────────────────────────────────────────────
+const barEl  = document.getElementById('magic-bar');
+const txtEl  = document.getElementById('score-txt');
+function updateHUD() {
+  barEl.style.width = Math.min(collected/GOAL*100, 100) + '%';
+  txtEl.textContent = `${Math.min(collected, GOAL)} / ${GOAL}`;
+}
+
+// ── Burst ────────────────────────────────────────────────────────
+function spawnBurst(x, y, emoji) {
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('div');
+    b.className = 'burst';
+    b.textContent = emoji;
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 50 + Math.random() * 70;
+    b.style.cssText = `
+      left:${x}px;top:${y}px;
+      --ox:-50%;--oy:-50%;
+      --fx:calc(-50% + ${(Math.cos(angle)*dist).toFixed(0)}px);
+      --fy:calc(-50% + ${(Math.sin(angle)*dist).toFixed(0)}px);
+      animation-delay:${(i*0.06).toFixed(2)}s;
+    `;
+    document.body.appendChild(b);
+    b.addEventListener('animationend', () => b.remove());
+  }
+}
+
+// ── Fireworks ────────────────────────────────────────────────────
+function fireworks() {
+  const colors = ['#ffd060','#ff80c0','#a060ff','#80ffff','#ff6040','#c0ff80','#ffb040'];
+  for (let w = 0; w < 9; w++) {
+    setTimeout(() => {
+      const cx = 80 + Math.random() * (window.innerWidth - 160);
+      const cy = 60 + Math.random() * (window.innerHeight * 0.55);
+      for (let p = 0; p < 26; p++) {
+        const fw = document.createElement('div');
+        fw.className = 'fw';
+        const angle = (p/26)*Math.PI*2;
+        const dist  = 55 + Math.random()*90;
+        const dur   = (0.5+Math.random()*0.7).toFixed(2);
+        const col   = colors[Math.floor(Math.random()*colors.length)];
+        fw.style.cssText = `
+          left:${cx}px;top:${cy}px;width:5px;height:5px;
+          background:${col};box-shadow:0 0 6px ${col};
+          --tx:${(Math.cos(angle)*dist).toFixed(0)}px;
+          --ty:${(Math.sin(angle)*dist).toFixed(0)}px;
+          --dur:${dur}s;
+        `;
+        document.body.appendChild(fw);
+        fw.addEventListener('animationend', () => fw.remove());
+      }
+    }, w * 320);
+  }
+}
+
+// ── Typewriter ───────────────────────────────────────────────────
+function typeWriter(el, text, speed, cb) {
+  let i = 0; el.textContent = '';
+  const tick = () => {
+    if (i < text.length) { el.textContent += text[i++]; setTimeout(tick, speed); }
+    else if (cb) cb();
+  };
+  tick();
+}
+
+// ── Show reveal ──────────────────────────────────────────────────
+function showReveal() {
+  done = true;
+  fireworks();
+  setTimeout(() => {
+    const ov = document.getElementById('overlay');
+    ov.classList.add('show');
+    const bodyEl = document.getElementById('ov-body');
+    const subEl  = document.getElementById('ov-sub');
+    typeWriter(bodyEl, BODY, 38, () => {
+      setTimeout(() => { subEl.textContent = SUB; }, 300);
+    });
+  }, 700);
+}
+
+// ── Replay ───────────────────────────────────────────────────────
+document.getElementById('replay-btn').addEventListener('click', () => {
+  collected = 0; done = false;
+  updateHUD();
+  const ov = document.getElementById('overlay');
+  ov.classList.remove('show');
+  document.getElementById('ov-body').textContent = '';
+  document.getElementById('ov-sub').textContent  = '';
+});
+
+// ── Spawn item ───────────────────────────────────────────────────
+function spawnItem() {
+  if (done) return;
+  const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+  const el   = document.createElement('div');
+  el.className = 'petal';
+  el.textContent = item.e;
+
+  const x    = Math.random() * (window.innerWidth - 60) + 10;
+  const sway = ((Math.random()-0.5)*160).toFixed(0);
+  const rot  = ((Math.random()-0.5)*720).toFixed(0) + 'deg';
+  const dur  = (4.5 + Math.random()*5).toFixed(1);
+
+  el.style.cssText = `
+    left:${x}px;
+    --glow:${item.glow};
+    --sway:${sway}px;
+    --rot:${rot};
+    animation-duration:${dur}s;
+  `;
+
+  el.addEventListener('click', e => {
+    if (done) return;
+    e.stopPropagation();
+    spawnBurst(e.clientX, e.clientY, item.e);
+    el.remove();
+    collected += item.pts;
+    updateHUD();
+    if (collected >= GOAL) showReveal();
+  });
+
+  el.addEventListener('animationend', () => el.remove());
+  document.body.appendChild(el);
+}
+
+// ── Loop ─────────────────────────────────────────────────────────
+function loop() {
+  if (!done) spawnItem();
+  setTimeout(loop, 550 + Math.random()*650);
+}
+
+updateHUD();
+for (let i = 0; i < 8; i++) setTimeout(spawnItem, i * 220);
+setTimeout(loop, 2000);
+</script>
+</body>
+</html>
