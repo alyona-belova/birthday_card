@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>С Днём Рождения!</title>
+  <meta property="og:title" content="С Днём Рождения! ✨" />
+  <meta property="og:description" content="Собери 30 волшебных артефактов и загадай желание!" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -76,17 +78,18 @@
     #hud {
       position: fixed;
       top: 22px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
+      right: 0;
       z-index: 30;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
+      padding: 0 16px;
     }
     #hud-label {
       color: #fff;
-      font-size: 13px;
+      font-size: 11px;
       letter-spacing: 0.5px;
       text-shadow: 0 0 12px #d080ff, 0 1px 3px rgba(0,0,0,0.8);
       background: rgba(80,20,140,0.55);
@@ -94,7 +97,9 @@
       border-radius: 99px;
       border: 1px solid rgba(200,130,255,0.35);
       backdrop-filter: blur(6px);
-      white-space: nowrap;
+      white-space: normal;
+      text-align: center;
+      max-width: 90vw;
     }
     #bar-wrap {
       position: relative;
